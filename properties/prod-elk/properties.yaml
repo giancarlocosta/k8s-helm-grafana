@@ -1,0 +1,47 @@
+# helm2.9.0 --kube-context=prod-elk --tiller-namespace=monitor --namespace monitor --name grafana-prod-elk install . --values properties/prod-elk/properties.yaml --debug
+# helm2.9.0 --kube-context=prod-elk --tiller-namespace=monitor --namespace monitor upgrade grafana-prod-elk . --values properties/prod-elk/properties.yaml --debug
+# helm2.9.0 --kube-context=prod-elk --tiller-namespace=monitor delete --purge grafana-prod-elk
+useCommonDashboards: true
+useCustomDashboards: true
+
+rbac:
+  create: true
+  pspEnabled: true
+serviceAccount:
+  create: true
+
+dataSource:
+  datasource.yaml: |-
+    apiVersion: 1
+    # list of datasources to insert/update
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus-elk-prometheus-server
+      # <bool> allow users to edit datasources from the UI.
+      editable: true
+
+server:
+  # This new image combined with the RBAC resources will make sure container
+  # has proper file permissions
+  image: "grafana/grafana:5.1.2"
+  adminUser: admin
+  annotations:
+    prometheus.io/scrape: "true"
+  persistentVolume:
+    enabled: false
+  setDatasource:
+    enabled: true
+    datasource:
+      name: Prometheus
+      url: "http://prometheus-elk-prometheus-server"
+  ingress:
+    enabled: true
+    hosts:
+      - grafana.prod-elk.yournetwork.net
+    annotations:
+      kubernetes.io/ingress.class: "elk-internal-ingress"
+      ingress.kubernetes.io/service-upstream: "true"
+      ingress.kubernetes.io/force-ssl-redirect: "true"
+      ingress.kubernetes.io/rewrite-target: /

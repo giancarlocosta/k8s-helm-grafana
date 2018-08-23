@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: {{ template "grafana.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Values.server.name }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+  name: {{ template "grafana.server.fullname" . }}-dashs
+data:
+  {{- if .Values.serverDashboardFiles }}
+{{ toYaml .Values.serverDashboardFiles | indent 2 }}
+  {{ end }}
+  {{- if .Values.useCommonDashboards }}
+{{ (.Files.Glob "common-dashboards/*.json").AsConfig | indent 2 }}
+  {{- end }}
