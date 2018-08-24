@@ -40,6 +40,6 @@ dashboard json files to a `custom-dashboards/` folder in the base dir of this Ch
 
 Example deployment to ELK Prod env
 ```
-helm --kube-context prod-elk --namespace ops --name prod-elk install . --values properties/prod-elk/properties.yaml --debug
-helm --kube-context prod-elk --namespace ops upgrade prod-elk . --values properties/prod-elk/properties.yaml --debug
+helm --kube-context prod-elk --namespace monitor --name prod-elk install . --values properties/prod-elk/properties.yaml --debug
+helm --kube-context prod-elk --namespace monitor upgrade prod-elk . --values properties/prod-elk/properties.yaml --debug
 ```
